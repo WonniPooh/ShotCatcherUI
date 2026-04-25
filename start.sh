@@ -14,10 +14,14 @@ cleanup() {
     echo ""
     echo "Shutting down..."
     kill "$BACKEND_PID" 2>/dev/null || true
-    kill "$FRONTEND_PID" 2>/dev/null || true
+    kill "${FRONTEND_PID:-}" 2>/dev/null || true
     wait 2>/dev/null
 }
 trap cleanup EXIT INT TERM
+
+# --- Python path for shared DB managers ---
+DM="$SCRIPT_DIR/../BinanceDataManagers"
+export PYTHONPATH="$DM:$DM/order_data_manager:$DM/trades_manager:$DM/user_trades_manager:$DM/klines_manager:$DM/position_manager${PYTHONPATH:+:$PYTHONPATH}"
 
 # --- Backend (FastAPI on port 8080) ---
 echo "Starting backend on :8080 ..."
