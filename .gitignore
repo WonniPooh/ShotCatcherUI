@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.env
+venv/
+env/
+.venv/
+*.egg-info/
+
+# Secrets & keys (never commit)
+secrets.json
+config/server.key
+config/*.key
+*.key
+*.pem
+
+# Logs
+logs/
+*.log
+
+# Tests
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Node / React (chart-ui frontend)
+node_modules/
+dist/
+dist-ssr/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp

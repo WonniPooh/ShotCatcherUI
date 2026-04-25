@@ -1,0 +1,23 @@
+{
+  "host": "0.0.0.0",
+  "port": 8080,
+
+  "ssl_certfile": "/home/oserbin/Documents/WebService/ShotCatcher/ui-server/config/server.crt",
+  "ssl_keyfile": "/home/oserbin/Documents/WebService/ShotCatcher/ui-server/config/server.key",
+
+  "auth_enabled": true,
+  "users_db_path": "../config/users.db",
+  "session_ttl_days": 7,
+  "allow_registration": false,
+
+  "db_root": "../db_files",
+
+  "collector_ws_url": "ws://localhost:8001/ws",
+  "collector_reconnect_interval": 5.0,
+
+  "worker_ws_url": "ws://localhost:9090",
+  "worker_reconnect_interval": 5.0,
+
+  "enable_chart": true,
+  "enable_dashboard": true
+}

@@ -1,0 +1,11 @@
+export const GREEN = '#22c55e';
+export const RED = '#ef4444';
+export const BG = '#0f1117';
+export const GRID_COLOR = '#1e2030';
+export const TEXT_COLOR = '#94a3b8';
+export const DOT_RADIUS = 2.5;
+export const X_AXIS_HEIGHT = 22;
+export const Y_AXIS_WIDTH = 60;
+export const LIVE_WINDOW_S = 120;  // 2-minute live viewport (trades visible, chart slides)
+export const LIVE_Y_BUFFER = 0.15;
+export const STABLE_LAG_S = 60;
