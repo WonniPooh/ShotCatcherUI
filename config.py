@@ -25,9 +25,9 @@ class Settings(BaseSettings):
     port: int = 8080
     api_key: str = ""  # legacy X-Api-Key header; empty = disabled
 
-    # TLS (None or empty = plain HTTP)
-    ssl_certfile: str | None = None
-    ssl_keyfile: str | None = None
+    # TLS (empty = plain HTTP)
+    ssl_certfile: str = ""
+    ssl_keyfile: str = ""
 
     # Auth
     auth_enabled: bool = False
