@@ -43,8 +43,8 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 import importlib
 _auth_middleware = importlib.import_module("auth.middleware")
 
-# data_manager lives two levels above routers/ at project root
-_DM_PATH = Path(__file__).resolve().parent.parent.parent / "data_manager"
+# BinanceDataManagers lives two levels above routers/ at project root
+_DM_PATH = Path(__file__).resolve().parent.parent.parent / "BinanceDataManagers"
 for _p in (_DM_PATH / "trades_manager",):
     _s = str(_p)
     if _s not in sys.path:

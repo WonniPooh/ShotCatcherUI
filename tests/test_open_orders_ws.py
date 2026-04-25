@@ -13,10 +13,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-# We need data_manager on path for OrderEventDB import
-_DM_PATH = Path(__file__).resolve().parent.parent.parent / "data_manager"
+# We need BinanceDataManagers on path for OrderEventDB import
+_DM_PATH = Path(__file__).resolve().parent.parent.parent / "BinanceDataManagers"
 sys.path.insert(0, str(_DM_PATH))
-sys.path.insert(0, str(_DM_PATH / "order_data_manager"))
+sys.path.insert(0, str(_DM_PATH / "order_BinanceDataManagers"))
 
 from routers.ws_ui import _collect_all_open_orders, _get_order_db, _order_dbs
 

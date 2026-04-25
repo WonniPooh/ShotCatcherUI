@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-_DM = Path(__file__).resolve().parent.parent.parent / "data_manager"
+_DM = Path(__file__).resolve().parent.parent.parent / "BinanceDataManagers"
 for _p in (_DM / "klines_manager", _DM / "trades_manager"):
     _s = str(_p)
     if _s not in sys.path:

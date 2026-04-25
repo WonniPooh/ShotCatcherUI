@@ -34,11 +34,11 @@ import importlib
 _auth_middleware = importlib.import_module("auth.middleware")
 
 # ── Order DB access ───────────────────────────────────────────────────────────
-_DM_PATH = Path(__file__).resolve().parent.parent.parent / "data_manager"
+_DM_PATH = Path(__file__).resolve().parent.parent.parent / "BinanceDataManagers"
 if str(_DM_PATH) not in sys.path:
     sys.path.insert(0, str(_DM_PATH))
-if str(_DM_PATH / "order_data_manager") not in sys.path:
-    sys.path.insert(0, str(_DM_PATH / "order_data_manager"))
+if str(_DM_PATH / "order_BinanceDataManagers") not in sys.path:
+    sys.path.insert(0, str(_DM_PATH / "order_BinanceDataManagers"))
 
 from order_events_db_manager import OrderEventDB  # type: ignore[import]
 

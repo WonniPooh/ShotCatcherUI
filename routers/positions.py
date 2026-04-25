@@ -17,11 +17,11 @@ from pathlib import Path
 from fastapi import APIRouter, Request
 
 # Position manager access
-_PM_PATH = Path(__file__).resolve().parent.parent.parent / "data_manager" / "position_manager"
+_PM_PATH = Path(__file__).resolve().parent.parent.parent / "BinanceDataManagers" / "position_manager"
 if str(_PM_PATH) not in sys.path:
     sys.path.insert(0, str(_PM_PATH))
 
-_UT_PATH = Path(__file__).resolve().parent.parent.parent / "data_manager" / "user_trades_manager"
+_UT_PATH = Path(__file__).resolve().parent.parent.parent / "BinanceDataManagers" / "user_trades_manager"
 if str(_UT_PATH) not in sys.path:
     sys.path.insert(0, str(_UT_PATH))
 

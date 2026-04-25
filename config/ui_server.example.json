@@ -2,8 +2,8 @@
   "host": "0.0.0.0",
   "port": 8080,
 
-  "ssl_certfile": "/home/oserbin/Documents/WebService/ShotCatcher/ui-server/config/server.crt",
-  "ssl_keyfile": "/home/oserbin/Documents/WebService/ShotCatcher/ui-server/config/server.key",
+  "ssl_certfile": "/home/oserbin/Documents/WebService/ShotCatcher/ShotCatcherUI/config/server.crt",
+  "ssl_keyfile": "/home/oserbin/Documents/WebService/ShotCatcher/ShotCatcherUI/config/server.key",
 
   "auth_enabled": true,
   "users_db_path": "../config/users.db",

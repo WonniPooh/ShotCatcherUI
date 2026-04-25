@@ -12,8 +12,8 @@ from typing import Any, Optional
 
 from fastapi import APIRouter, Query, Request
 
-# data_manager lives at project root (two levels above this file's routers/ dir)
-_DM_PATH = Path(__file__).resolve().parent.parent.parent / "data_manager"
+# BinanceDataManagers lives at project root (two levels above this file's routers/ dir)
+_DM_PATH = Path(__file__).resolve().parent.parent.parent / "BinanceDataManagers"
 for _p in (_DM_PATH / "klines_manager", _DM_PATH / "trades_manager"):
     _s = str(_p)
     if _s not in sys.path:
