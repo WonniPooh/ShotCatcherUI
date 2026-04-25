@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
-# Start the Chart UI backend (FastAPI) and frontend (Vite) together.
-# Usage: ./start.sh
+# Start the Chart UI backend (FastAPI) and optionally frontend (Vite).
+# Usage: ./start.sh [--backend-only]
 #
 # Prereqs (first time):
-#   pip install -r requirements.txt
-#   cd chart-ui && npm install
+#   pip install -r requirements.txt --break-system-packages
+#   cd chart-ui && npm install   (only needed for --frontend / dev mode)
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+RUN_FRONTEND=true
+for arg in "$@"; do
+  case "$arg" in
+    --backend-only) RUN_FRONTEND=false ;;
+    *) echo "Unknown argument: $arg"; exit 1 ;;
+  esac
+done
 
 cleanup() {
     echo ""
@@ -52,15 +60,17 @@ for i in $(seq 1 30); do
 done
 
 # --- Frontend (Vite on port 5173) ---
-echo "Starting frontend on :5173 ..."
-cd "$SCRIPT_DIR/chart-ui"
-npx vite --host 0.0.0.0 &
-FRONTEND_PID=$!
+if $RUN_FRONTEND; then
+    echo "Starting frontend on :5173 ..."
+    cd "$SCRIPT_DIR/chart-ui"
+    npx vite --host 0.0.0.0 &
+    FRONTEND_PID=$!
+fi
 
 echo ""
 echo "============================================"
-echo "  Chart UI:  http://localhost:5173"
-echo "  API:       ${SCHEME:-http}://localhost:8080/api/auth/me"
+echo "  API:       ${SCHEME:-http}://localhost:8080"
+$RUN_FRONTEND && echo "  Chart UI:  http://localhost:5173"
 echo "============================================"
 echo ""
 echo "Press Ctrl+C to stop."
