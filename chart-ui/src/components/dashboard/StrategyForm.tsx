@@ -6,6 +6,8 @@ const DEFAULT_CONFIG: StrategyConfig = {
   symbol: '',
   direction: 'LONG',
   leverage: 10,
+  leverage_limit: null,
+  min_allowed_leverage: null,
   quantity_usdt: 50,
   entry_distance_pct: 1.5,
   buffer_pct: 0.25,
@@ -42,7 +44,17 @@ function validateConfig(config: StrategyConfig, sizingMode: SizingMode): string 
   const symbol = config.symbol.trim().toUpperCase();
   if (!symbol) return 'Symbol is required';
   if (!symbol.endsWith('USDT')) return 'Symbol must end with USDT';
-  if (config.leverage < 1 || config.leverage > 125) return 'Leverage must be 1-125';
+  if (config.leverage !== 'max') {
+    if (typeof config.leverage !== 'number' || config.leverage < 1 || config.leverage > 125)
+      return 'Leverage must be 1-125';
+  }
+  if (config.leverage === 'max' && config.leverage_limit != null && config.leverage_limit > 0) {
+    if (config.leverage_limit < 1 || config.leverage_limit > 125) return 'Leverage limit must be 1-125';
+  }
+  if (config.min_allowed_leverage != null && config.min_allowed_leverage > 0) {
+    if (config.min_allowed_leverage < 1 || config.min_allowed_leverage > 125)
+      return 'Min allowed leverage must be 1-125';
+  }
 
   const sizeVal = config[sizingMode];
   if (sizeVal == null || sizeVal <= 0) return 'Size must be > 0';
@@ -64,6 +76,9 @@ interface StrategyFormProps {
 
 export default function StrategyForm({ initialConfig, isModify, onSubmit, onClear }: StrategyFormProps) {
   const [config, setConfig] = useState<StrategyConfig>(initialConfig ?? DEFAULT_CONFIG);
+  const [leverageMode, setLeverageMode] = useState<'fixed' | 'max'>(
+    initialConfig?.leverage === 'max' ? 'max' : 'fixed',
+  );
   const [sizingMode, setSizingMode] = useState<SizingMode>(
     initialConfig?.quantity != null
       ? 'quantity'
@@ -134,6 +149,12 @@ export default function StrategyForm({ initialConfig, isModify, onSubmit, onClea
     else if (sizingMode === 'quantity_usdt') final.quantity_usdt = config.quantity_usdt ?? 50;
     else final.quantity_margin_usdt = config.quantity_margin_usdt ?? 50;
     final.symbol = final.symbol.toUpperCase().trim();
+    // Leverage
+    if (leverageMode === 'max') {
+      final.leverage = 'max';
+    }
+    if (leverageMode !== 'max' || !final.leverage_limit) delete final.leverage_limit;
+    if (!final.min_allowed_leverage) delete final.min_allowed_leverage;
     return final;
   };
 
@@ -159,6 +180,7 @@ export default function StrategyForm({ initialConfig, isModify, onSubmit, onClea
 
   const handleReset = () => {
     setConfig(DEFAULT_CONFIG);
+    setLeverageMode('fixed');
     setSizingMode('quantity_usdt');
     setValidationError(null);
     setShowConfirm(false);
@@ -240,9 +262,38 @@ export default function StrategyForm({ initialConfig, isModify, onSubmit, onClea
         </div>
         <div>
           <label className={labelClass}>Leverage</label>
-          <input type="number" className={inputClass} min={1} max={125} value={config.leverage} onChange={(e) => numField('leverage', e.target.value)} />
+          <div className="flex gap-1">
+            <select
+              className={inputClass + ' w-24 flex-shrink-0'}
+              value={leverageMode}
+              onChange={(e) => {
+                const mode = e.target.value as 'fixed' | 'max';
+                setLeverageMode(mode);
+                if (mode === 'max') set('leverage', 'max' as unknown as StrategyConfig['leverage']);
+                else set('leverage', 10);
+              }}
+            >
+              <option value="fixed">Fixed</option>
+              <option value="max">Max</option>
+            </select>
+            {leverageMode === 'fixed' ? (
+              <input type="number" className={inputClass} min={1} max={125} value={typeof config.leverage === 'number' ? config.leverage : 10} onChange={(e) => numField('leverage', e.target.value)} />
+            ) : (
+              <input type="number" className={inputClass} min={1} max={125} placeholder="Limit (opt)" value={config.leverage_limit ?? ''} onChange={(e) => nullableNumField('leverage_limit', e.target.value)} title="Cap max leverage to this value" />
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Min allowed leverage — shown when leverage is "max" */}
+      {leverageMode === 'max' && (
+        <div className="grid grid-cols-3 gap-3">
+          <div className="col-start-3">
+            <label className={labelClass}>Min Leverage</label>
+            <input type="number" className={inputClass} min={1} max={125} placeholder="Disable if below (opt)" value={config.min_allowed_leverage ?? ''} onChange={(e) => nullableNumField('min_allowed_leverage', e.target.value)} title="Disable strategy if exchange max leverage drops below this" />
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <div>

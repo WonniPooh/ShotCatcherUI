@@ -108,8 +108,17 @@ def _validate_strategy(config: dict) -> str | None:
         return f"direction must be LONG or SHORT, got {direction}"
 
     leverage = config.get("leverage", 0)
-    if not isinstance(leverage, (int, float)) or leverage < 1 or leverage > 125:
-        return f"leverage must be 1-125, got {leverage}"
+    if leverage == "max":
+        # leverage_limit is optional; if present must be 1-125
+        lev_limit = config.get("leverage_limit", 0)
+        if lev_limit and (not isinstance(lev_limit, (int, float)) or lev_limit < 1 or lev_limit > 125):
+            return f"leverage_limit must be 1-125, got {lev_limit}"
+    elif not isinstance(leverage, (int, float)) or leverage < 1 or leverage > 125:
+        return f"leverage must be 1-125 or 'max', got {leverage}"
+
+    min_lev = config.get("min_allowed_leverage", 0)
+    if min_lev and (not isinstance(min_lev, (int, float)) or min_lev < 1 or min_lev > 125):
+        return f"min_allowed_leverage must be 1-125, got {min_lev}"
 
     # Exactly one sizing field must be set
     sizing_fields = ["quantity", "quantity_usdt", "quantity_margin_usdt"]
@@ -159,7 +168,7 @@ async def _handle_save_config(ws: WebSocket, filename: str, strategies: list[dic
 
 
 async def _handle_load_config(ws: WebSocket, worker_client: Any, filename: str) -> None:
-    """Load strategies from a named file and send add_strat to worker."""
+    """Load strategies from a named file and send add_strat to worker (added, not started)."""
     safe = _safe_filename(filename)
     if not safe:
         await ws.send_text(json.dumps({"type": "error", "msg": "Invalid filename"}))
@@ -194,7 +203,7 @@ async def _handle_load_config(ws: WebSocket, worker_client: Any, filename: str) 
             worker_strategies.append(w)
 
         fwd = {
-            "type": "start_strat",
+            "type": "add_strat",
             "strategies": {"strategies": worker_strategies},
         }
         worker_client.track_outgoing(fwd)

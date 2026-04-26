@@ -2,7 +2,9 @@
 export interface StrategyConfig {
   symbol: string;
   direction: 'LONG' | 'SHORT';
-  leverage: number;
+  leverage: number | 'max';
+  leverage_limit?: number | null;          // cap on "max" leverage: min(exchange_max, limit). 0/null = no cap
+  min_allowed_leverage?: number | null;    // disable strategy if exchange max < this. 0/null = no minimum
 
   // Sizing — exactly one must be set
   quantity?: number;

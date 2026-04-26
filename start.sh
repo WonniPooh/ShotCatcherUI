@@ -1,10 +1,30 @@
 #!/usr/bin/env bash
-# Start the Chart UI backend (FastAPI) and optionally frontend (Vite).
-# Usage: ./start.sh [--backend-only] [--tmux]
+# ShotCatcherUI — start script
+#
+# Starts the FastAPI backend and optionally the Vite dev frontend and/or
+# the ShotCatcherCollector data collector.
+#
+# Usage:
+#   ./start.sh [options]
+#
+# Options:
+#   --backend-only      Start backend only (skip Vite frontend)
+#   --with-collector    Also start ShotCatcherCollector in the background
+#   --no-trades         Disable aggTrades loading in the UI and skip aggTrades
+#                       collection in the collector (positions/orders still work)
+#   --tmux              Run everything in a detached tmux session
+#   -h, --help          Show this help
+#
+# Examples:
+#   ./start.sh                              # backend + Vite frontend (foreground)
+#   ./start.sh --tmux                       # same, inside tmux
+#   ./start.sh --backend-only --tmux        # backend only, detached
+#   ./start.sh --with-collector --no-trades # backend + collector, no trade data
+#   ./start.sh --tmux --with-collector --no-trades
 #
 # Prereqs (first time):
 #   pip install -r requirements.txt --break-system-packages
-#   cd chart-ui && npm install   (only needed for --frontend / dev mode)
+#   cd chart-ui && npm install   (only needed for Vite dev mode)
 
 set -euo pipefail
 
@@ -22,6 +42,10 @@ for arg in "$@"; do
     --with-collector)  RUN_COLLECTOR=true ;;
     --no-trades)       NO_TRADES=true ;;
     --tmux)            USE_TMUX=true ;;
+    -h|--help)
+      sed -n '/^# /p' "$0" | sed 's/^# \?//'
+      exit 0
+      ;;
     *) echo "Unknown argument: $arg"; exit 1 ;;
   esac
 done

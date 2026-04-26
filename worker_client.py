@@ -47,6 +47,9 @@ class WorkerClient:
         # Strategy cache: symbol → {"config": {...}, "status": "off"|"on"|"stopped"|"error", "error": str|None}
         self._strategies: dict[str, dict[str, Any]] = {}
 
+        # Outbound queue — messages buffered while disconnected, flushed on reconnect
+        self._send_queue: asyncio.Queue[dict] = asyncio.Queue()
+
     @property
     def connected(self) -> bool:
         return self._connected
@@ -94,15 +97,33 @@ class WorkerClient:
             await self._ws.close()
 
     async def send(self, msg: dict) -> None:
-        """Send a command to the worker. Logs and drops if not connected."""
+        """Send a command to the worker. Queues if not connected — flushed on reconnect."""
         if self._ws and self._connected:
             try:
                 await self._ws.send(json.dumps(msg))
                 logger.info("→ Worker: %s", msg.get("type"))
             except Exception as exc:
-                logger.warning("Send to Worker failed: %s  msg=%s", exc, msg)
+                logger.warning("Send to Worker failed, queuing: %s  msg=%s", exc, msg.get("type"))
+                await self._send_queue.put(msg)
         else:
-            logger.warning("Worker not connected, DROPPED: %s", msg.get("type"))
+            logger.info("Worker not connected, queued: %s", msg.get("type"))
+            await self._send_queue.put(msg)
+
+    async def _flush_queue(self) -> None:
+        """Drain buffered commands after (re)connect."""
+        flushed = 0
+        while not self._send_queue.empty():
+            msg = self._send_queue.get_nowait()
+            try:
+                await self._ws.send(json.dumps(msg))
+                flushed += 1
+                logger.info("→ Worker (queued): %s", msg.get("type"))
+            except Exception as exc:
+                logger.warning("Flush failed, re-queuing: %s", exc)
+                await self._send_queue.put(msg)
+                break
+        if flushed:
+            logger.info("Flushed %d queued command(s) to Worker", flushed)
 
     # ── Private ───────────────────────────────────────────────────────────────
 
@@ -149,6 +170,9 @@ class WorkerClient:
                         logger.info("→ Worker: list_strats (sync)")
                     except Exception:
                         pass
+
+                    # Flush any commands that were queued while disconnected
+                    await self._flush_queue()
 
                     async for raw in ws:
                         try:
