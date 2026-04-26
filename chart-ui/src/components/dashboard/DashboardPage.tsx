@@ -53,14 +53,6 @@ export default function DashboardPage() {
     [send, addStrategy, modifyStrategy, selectedStrategy],
   );
 
-  const handleCloneStrategy = useCallback(
-    (strategy: Strategy) => {
-      setSelectedStrategy(null);
-      setCloneConfig({ ...strategy.config, symbol: '' });
-    },
-    [],
-  );
-
   const handleStartStrategy = useCallback(
     (symbol: string) => {
       send({ type: 'start_strat', symbols: [symbol] });
@@ -217,7 +209,6 @@ export default function DashboardPage() {
                   onKill={handleKillStrategy}
                   onRemove={handleRemoveStrategy}
                   onSelect={(s) => { setCloneConfig(null); setSelectedStrategy(s); }}
-                  onClone={handleCloneStrategy}
                   engineReady={engineReady}
                 />
               ))}
@@ -233,6 +224,10 @@ export default function DashboardPage() {
             isModify={selectedStrategy != null}
             onSubmit={handleFormSubmit}
             onClear={() => { setSelectedStrategy(null); setCloneConfig(null); }}
+            onClone={selectedStrategy ? () => {
+              setCloneConfig({ ...selectedStrategy.config, symbol: '' });
+              setSelectedStrategy(null);
+            } : undefined}
           />
         </div>
       </div>

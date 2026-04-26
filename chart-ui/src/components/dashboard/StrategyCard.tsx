@@ -8,7 +8,6 @@ interface StrategyCardProps {
   onKill: (symbol: string) => void;
   onRemove: (symbol: string) => void;
   onSelect: (strategy: Strategy) => void;
-  onClone: (strategy: Strategy) => void;
   engineReady: boolean;
 }
 
@@ -19,7 +18,6 @@ export default function StrategyCard({
   onKill,
   onRemove,
   onSelect,
-  onClone,
   engineReady,
 }: StrategyCardProps) {
   const { symbol, status, config, resolved_leverage, error } = strategy;
@@ -123,13 +121,6 @@ export default function StrategyCard({
             </button>
           </>
         )}
-        <button
-            type="button"
-            className="px-3 py-1 text-xs rounded bg-blue-700 hover:bg-blue-600 text-white transition-colors"
-            onClick={() => onClone(strategy)}
-          >
-            Clone
-          </button>
         {canModify && (
           <button
             type="button"

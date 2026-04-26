@@ -72,9 +72,10 @@ interface StrategyFormProps {
   isModify?: boolean;
   onSubmit: (config: StrategyConfig) => void;
   onClear?: () => void;
+  onClone?: () => void;
 }
 
-export default function StrategyForm({ initialConfig, isModify, onSubmit, onClear }: StrategyFormProps) {
+export default function StrategyForm({ initialConfig, isModify, onSubmit, onClear, onClone }: StrategyFormProps) {
   const [config, setConfig] = useState<StrategyConfig>(initialConfig ?? DEFAULT_CONFIG);
   const [leverageMode, setLeverageMode] = useState<'fixed' | 'max'>(
     initialConfig?.leverage === 'max' ? 'max' : 'fixed',
@@ -474,13 +475,24 @@ export default function StrategyForm({ initialConfig, isModify, onSubmit, onClea
             {isModify ? 'Modify Strategy' : 'Add Strategy'}
           </button>
           {isModify && onClear ? (
-            <button
-              type="button"
-              className="px-4 py-2 text-sm rounded bg-gray-700 hover:bg-gray-600 text-gray-300 transition-colors"
-              onClick={onClear}
-            >
-              Cancel Edit
-            </button>
+            <div className="flex gap-2">
+              {onClone && (
+                <button
+                  type="button"
+                  className="px-4 py-2 text-sm rounded bg-blue-700 hover:bg-blue-600 text-white transition-colors"
+                  onClick={onClone}
+                >
+                  Clone
+                </button>
+              )}
+              <button
+                type="button"
+                className="px-4 py-2 text-sm rounded bg-gray-700 hover:bg-gray-600 text-gray-300 transition-colors"
+                onClick={onClear}
+              >
+                Cancel Edit
+              </button>
+            </div>
           ) : (
             <button
               type="button"
