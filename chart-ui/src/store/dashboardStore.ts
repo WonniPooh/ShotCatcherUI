@@ -171,6 +171,14 @@ export const useDashboardStore = create<DashboardState>((set) => ({
         }));
         break;
 
+      case 'leverage_changed':
+        set((s) => ({
+          strategies: s.strategies.map((st) =>
+            st.symbol === msg.symbol ? { ...st, resolved_leverage: msg.leverage } : st,
+          ),
+        }));
+        break;
+
       case 'strategy_error':
         set((s) => ({
           lastError: `${msg.symbol}: ${msg.msg}`,

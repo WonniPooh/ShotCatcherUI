@@ -182,6 +182,12 @@ export interface StrategyResumedEvent {
   symbol: string;
 }
 
+export interface LeverageChangedEvent {
+  type: 'leverage_changed';
+  symbol: string;
+  leverage: number;  // new actual leverage on the exchange
+}
+
 export type WorkerEvent =
   | StrategyReadyEvent
   | StrategyStoppedEvent
@@ -203,4 +209,5 @@ export type WorkerEvent =
   | ConfigDeletedEvent
   | ConfigRenamedEvent
   | LossStatusEvent
-  | StrategiesSnapshotEvent;
+  | StrategiesSnapshotEvent
+  | LeverageChangedEvent;
