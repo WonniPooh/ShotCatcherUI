@@ -28,8 +28,8 @@ export function useDrawings(
   const setActiveDrawingTool = useChartStore(st => st.setActiveDrawingTool);
   const setIsMeasuring    = useChartStore(st => st.setIsMeasuring);
 
-  const [measureStart, setMeasureStart] = useState<MeasurePoint | null>(null);
-  const [measureEnd,   setMeasureEnd]   = useState<MeasurePoint | null>(null);
+  const [_measureStart, setMeasureStart] = useState<MeasurePoint | null>(null);
+  const [_measureEnd,   setMeasureEnd]   = useState<MeasurePoint | null>(null);
   const shiftHeldRef  = useRef(false);
   const [shiftHeld, setShiftHeld] = useState(false);
   const measureStartRef = useRef<MeasurePoint | null>(null);
@@ -196,8 +196,8 @@ export function useDrawings(
       setActiveDrawingTool(null);
     };
 
-    container.addEventListener('click', handler);
-    return () => container.removeEventListener('click', handler);
+    container.addEventListener('click', handler as EventListener);
+    return () => container.removeEventListener('click', handler as EventListener);
   }, [activeDrawingTool, addDrawing, setActiveDrawingTool, setSelectedDrawingId, containerRef, canvasRef, isTradesMode, pixelToPrice, stateRef]);
 
   // --- Ruler mousemove tracking (after first click, before second click) ---
@@ -222,8 +222,8 @@ export function useDrawings(
       };
     };
 
-    container.addEventListener('mousemove', onMouseMove);
-    return () => container.removeEventListener('mousemove', onMouseMove);
+    container.addEventListener('mousemove', onMouseMove as EventListener);
+    return () => container.removeEventListener('mousemove', onMouseMove as EventListener);
   }, [containerRef, canvasRef, isTradesMode, pixelToPrice, stateRef]);
 
   // --- Sync hline drawings to KlineCharts overlays (candle mode only) ---

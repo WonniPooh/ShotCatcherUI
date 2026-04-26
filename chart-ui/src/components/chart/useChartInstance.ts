@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 import type { RefObject, MutableRefObject } from 'react';
-import { init, type KLineData } from 'klinecharts';
+import { init, dispose, type KLineData } from 'klinecharts';
 import { useChartStore } from '../../store/chartStore';
 import { fetchKlines } from '../../hooks/useBinanceStream';
-import { BG, GREEN, GRID_COLOR, TEXT_COLOR, LIVE_WINDOW_S, Y_AXIS_WIDTH, X_AXIS_HEIGHT } from './constants';
+import { GREEN, GRID_COLOR, TEXT_COLOR, Y_AXIS_WIDTH, X_AXIS_HEIGHT } from './constants';
 import type { ChartState } from './types';
 import { renderDotsCanvas } from './canvasRenderer';
 import type { Period } from 'klinecharts';
@@ -91,6 +91,7 @@ export function useChartInstance(
         },
       },
     });
+    if (!chart) return;
     s.kchart = chart;
 
     // VOL indicator — created once, lives for the lifetime of the component
@@ -440,7 +441,7 @@ export function useChartInstance(
       if (wheelAxisTimer !== null) clearTimeout(wheelAxisTimer);
       cancelAnimationFrame(rafId);
       ro.disconnect();
-      chart.destroy();
+      dispose(container);
       s.kchart = null;
       s.liveBarCallback = null;
     };

@@ -120,7 +120,7 @@ function renderSingleTrace(rc: RenderContext, trace: OrderTrace): void {
 function renderEndMarker(
   rc: RenderContext,
   marker: OrderEndMarker,
-  traceColor: string,
+  _traceColor: string,
 ): void {
   const { ctx, toX, toY, chartW, drawH, viewportFrom, viewportTo } = rc;
 

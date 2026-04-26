@@ -19,7 +19,7 @@ interface AuthState {
   getWsTicket: () => Promise<string>;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set, _get) => ({
   authenticated: false,
   username: null,
   role: null,

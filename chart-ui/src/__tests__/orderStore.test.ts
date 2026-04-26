@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useOrderStore } from '../store/orderStore';
 import type { OrderEventRaw } from '../types/orders';
 

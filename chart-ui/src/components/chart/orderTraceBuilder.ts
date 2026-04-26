@@ -21,8 +21,6 @@ const TERMINAL_STATUSES = new Set([
   'FILLED', 'CANCELED', 'EXPIRED', 'REJECTED', 'EXPIRED_IN_MATCH',
 ]);
 
-const ENTRY_EXEC_TYPES = new Set(['NEW', 'TRADE']);
-
 /**
  * Determine if an order is an entry (new position) or exit (reduce/close).
  * Heuristic: if is_reduce_only=1 or order type is SL/TP, it's an exit.

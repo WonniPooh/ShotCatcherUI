@@ -4,12 +4,12 @@ import { useBinanceStream } from '../../hooks/useBinanceStream';
 import { useChartStore } from '../../store/chartStore';
 import { GREEN, RED } from './constants';
 import type { ChartState } from './types';
-import type { RawTrade, BinanceKline } from '../../types/chart';
+import type { RawTrade, BinanceKline, TimeFrame } from '../../types/chart';
 
 export function useTradeUpdates(
   stateRef: MutableRefObject<ChartState>,
   activeSymbol: string,
-  timeframe: string,
+  timeframe: TimeFrame,
   isTradesMode: boolean,
 ): void {
   const handleTrade = useCallback(

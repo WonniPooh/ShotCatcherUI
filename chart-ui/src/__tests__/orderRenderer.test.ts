@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { renderOrderTraces } from '../components/chart/orderRenderer';
 import type { OrderTrace } from '../types/orders';
 

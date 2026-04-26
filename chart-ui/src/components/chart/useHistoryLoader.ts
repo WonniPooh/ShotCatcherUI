@@ -4,7 +4,6 @@ import { useChartStore } from '../../store/chartStore';
 import { useAuthStore } from '../../store/authStore';
 import { GREEN, RED, LIVE_WINDOW_S } from './constants';
 import type { ChartState } from './types';
-import type { VolumeBar } from '../../types/chart';
 // ── /ws/data-stream protocol types ───────────────────────────────────────────
 interface WSTrade {
   agg_trade_id: number;

@@ -65,7 +65,7 @@ interface OpenOrderState {
   clear: () => void;
 }
 
-export const useOpenOrderStore = create<OpenOrderState>((set, get) => ({
+export const useOpenOrderStore = create<OpenOrderState>((set, _get) => ({
   orders: [],
   loaded: false,
 
