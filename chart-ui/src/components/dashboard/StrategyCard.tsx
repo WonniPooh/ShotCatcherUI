@@ -20,11 +20,21 @@ export default function StrategyCard({
   onSelect,
   engineReady,
 }: StrategyCardProps) {
-  const { symbol, status, config, error } = strategy;
+  const { symbol, status, config, resolved_leverage, error } = strategy;
   const isOn = status === 'on';
   const isOff = status === 'off' || status === 'stopped';
   const isPaused = status === 'paused';
   const canModify = isOff || status === 'error';
+
+  // Leverage display: show resolved if available, otherwise config value
+  const leverageDisplay = (() => {
+    if (resolved_leverage) return `${resolved_leverage}x`;
+    if (config.leverage === 'max') {
+      const limit = config.leverage_limit;
+      return limit ? `max (≤${limit})` : 'max';
+    }
+    return config.leverage != null ? `${config.leverage}x` : '—';
+  })();
 
   // Sizing display
   let sizing = '';
@@ -59,7 +69,7 @@ export default function StrategyCard({
       {/* Key params */}
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm mb-3">
         <div className="text-gray-400">
-          Leverage: <span className="text-gray-200">{config.leverage ?? '—'}x</span>
+          Leverage: <span className="text-gray-200">{leverageDisplay}</span>
         </div>
         <div className="text-gray-400">
           Entry: <span className="text-gray-200">{config.entry_distance_pct ?? '—'}%</span>

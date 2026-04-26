@@ -113,7 +113,14 @@ export const useDashboardStore = create<DashboardState>((set) => ({
             return {
               engineState: 'trading',
               strategies: s.strategies.map((st) =>
-                st.symbol === msg.symbol ? { ...st, status: 'on' as const, error: undefined } : st,
+                st.symbol === msg.symbol
+                  ? {
+                      ...st,
+                      status: 'on' as const,
+                      error: undefined,
+                      resolved_leverage: msg.leverage ?? st.resolved_leverage,
+                    }
+                  : st,
               ),
             };
           }
@@ -190,14 +197,19 @@ export const useDashboardStore = create<DashboardState>((set) => ({
         // If backend returns the strategies, add them to the store
         if (msg.strategies && Array.isArray(msg.strategies)) {
           set((s) => {
-            const newStrats: Strategy[] = msg.strategies!.map((c) => ({
-              symbol: c.symbol,
-              status: 'off' as const,
-              config: c,
-            }));
+            const newStrats: Strategy[] = msg.strategies!.flatMap((c) => {
+              // Config files may use { symbol: "X" } (UI format) or { symbols: ["X","Y"] } (worker format)
+              const rawSymbols: string[] = (c as unknown as { symbols?: string[] }).symbols
+                ?? (c.symbol ? [c.symbol] : []);
+              return rawSymbols.map((sym) => ({
+                symbol: sym,
+                status: 'off' as const,
+                config: { ...c, symbol: sym },
+              }));
+            });
             // Merge — don't duplicate existing symbols
             const existingSymbols = new Set(s.strategies.map((st) => st.symbol));
-            const toAdd = newStrats.filter((st) => !existingSymbols.has(st.symbol));
+            const toAdd = newStrats.filter((st) => st.symbol && !existingSymbols.has(st.symbol));
             return {
               lastError: null,
               strategies: [...s.strategies, ...toAdd],

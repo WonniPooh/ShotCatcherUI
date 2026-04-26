@@ -50,6 +50,7 @@ export interface Strategy {
   symbol: string;
   status: StrategyStatus;
   config: StrategyConfig;
+  resolved_leverage?: number;  // actual leverage set on the exchange (returned by worker)
   error?: string;
 }
 
@@ -58,6 +59,7 @@ export interface Strategy {
 export interface StrategyReadyEvent {
   type: 'strategy_ready';
   symbol: string;
+  leverage?: number;  // resolved leverage (e.g. 75 when config was "max")
 }
 
 export interface StrategyStoppedEvent {
