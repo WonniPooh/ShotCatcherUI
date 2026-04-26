@@ -24,7 +24,7 @@ export default function StrategyCard({
   const isOn = status === 'on';
   const isOff = status === 'off' || status === 'stopped' || status === 'error';
   const isPaused = status === 'paused';
-  const canModify = isOff || status === 'error';
+  const canModify = isOff;
 
   // Leverage display: show resolved if available, otherwise config value
   const leverageDisplay = (() => {
