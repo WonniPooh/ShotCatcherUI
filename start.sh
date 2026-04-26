@@ -12,6 +12,7 @@
 #   --with-collector    Also start ShotCatcherCollector in the background
 #   --no-trades         Disable aggTrades loading in the UI and skip aggTrades
 #                       collection in the collector (positions/orders still work)
+#   --build             Rebuild chart-ui (npm run build) before starting
 #   --tmux              Run everything in a detached tmux session
 #   -h, --help          Show this help
 #
@@ -19,6 +20,7 @@
 #   ./start.sh                              # backend + Vite frontend (foreground)
 #   ./start.sh --tmux                       # same, inside tmux
 #   ./start.sh --backend-only --tmux        # backend only, detached
+#   ./start.sh --build --backend-only       # rebuild UI then start backend only
 #   ./start.sh --with-collector --no-trades # backend + collector, no trade data
 #   ./start.sh --tmux --with-collector --no-trades
 #
@@ -33,6 +35,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 RUN_FRONTEND=true
 RUN_COLLECTOR=false
 NO_TRADES=false
+BUILD_UI=false
 USE_TMUX=false
 SESSION="shotcatcher-ui"
 
@@ -41,6 +44,7 @@ for arg in "$@"; do
     --backend-only)    RUN_FRONTEND=false ;;
     --with-collector)  RUN_COLLECTOR=true ;;
     --no-trades)       NO_TRADES=true ;;
+    --build)           BUILD_UI=true ;;
     --tmux)            USE_TMUX=true ;;
     -h|--help)
       sed -n '/^# /p' "$0" | sed 's/^# \?//'
@@ -52,6 +56,25 @@ done
 
 if $NO_TRADES; then
     export CHART_UI_TRADES_ENABLED=false
+fi
+
+# --- Build chart-ui if requested or dist is missing/stale ---
+CHART_UI_DIR="$SCRIPT_DIR/chart-ui"
+DIST_DIR="$CHART_UI_DIR/dist"
+_needs_build=false
+if $BUILD_UI; then
+    _needs_build=true
+elif [[ ! -d "$DIST_DIR" ]]; then
+    echo "chart-ui/dist not found — running npm run build"
+    _needs_build=true
+elif [[ -n "$(find "$CHART_UI_DIR/src" -newer "$DIST_DIR" -name '*.ts' -o -name '*.tsx' -o -name '*.css' 2>/dev/null | head -1)" ]]; then
+    echo "chart-ui/src has files newer than dist — running npm run build"
+    _needs_build=true
+fi
+if $_needs_build; then
+    echo "Building chart-ui..."
+    (cd "$CHART_UI_DIR" && npm run build)
+    echo "Build complete."
 fi
 
 # --- Python path for shared DB managers ---

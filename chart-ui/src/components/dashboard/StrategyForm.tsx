@@ -215,8 +215,8 @@ export default function StrategyForm({ initialConfig, isModify, onSubmit, onClea
         </div>
       )}
 
-      {/* ── Core: Symbol, Direction, Leverage, Sizing ── */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* ── Core: Symbol, Direction ── */}
+      <div className="grid grid-cols-2 gap-3">
         <div className="relative" ref={symbolRef}>
           <label className={labelClass}>Symbol</label>
           <input
@@ -260,40 +260,7 @@ export default function StrategyForm({ initialConfig, isModify, onSubmit, onClea
             <option value="SHORT">SHORT</option>
           </select>
         </div>
-        <div>
-          <label className={labelClass}>Leverage</label>
-          <div className="flex gap-1">
-            <select
-              className={inputClass + ' w-24 flex-shrink-0'}
-              value={leverageMode}
-              onChange={(e) => {
-                const mode = e.target.value as 'fixed' | 'max';
-                setLeverageMode(mode);
-                if (mode === 'max') set('leverage', 'max' as unknown as StrategyConfig['leverage']);
-                else set('leverage', 10);
-              }}
-            >
-              <option value="fixed">Fixed</option>
-              <option value="max">Max</option>
-            </select>
-            {leverageMode === 'fixed' ? (
-              <input type="number" className={inputClass} min={1} max={125} value={typeof config.leverage === 'number' ? config.leverage : 10} onChange={(e) => numField('leverage', e.target.value)} />
-            ) : (
-              <input type="number" className={inputClass} min={1} max={125} placeholder="Limit (opt)" value={config.leverage_limit ?? ''} onChange={(e) => nullableNumField('leverage_limit', e.target.value)} title="Cap max leverage to this value" />
-            )}
-          </div>
-        </div>
       </div>
-
-      {/* Min allowed leverage — shown when leverage is "max" */}
-      {leverageMode === 'max' && (
-        <div className="grid grid-cols-3 gap-3">
-          <div className="col-start-3">
-            <label className={labelClass}>Min Leverage</label>
-            <input type="number" className={inputClass} min={1} max={125} placeholder="Disable if below (opt)" value={config.min_allowed_leverage ?? ''} onChange={(e) => nullableNumField('min_allowed_leverage', e.target.value)} title="Disable strategy if exchange max leverage drops below this" />
-          </div>
-        </div>
-      )}
 
       <div className="grid grid-cols-2 gap-3">
         <div>
@@ -309,6 +276,46 @@ export default function StrategyForm({ initialConfig, isModify, onSubmit, onClea
           <input type="number" className={inputClass} min={0} step="any" value={sizingValue ?? ''} onChange={(e) => numField(sizingMode, e.target.value)} />
         </div>
       </div>
+
+      {/* ── Leverage ── */}
+      <fieldset className="border border-gray-700 rounded p-3">
+        <legend className="text-xs text-gray-500 px-1">Leverage</legend>
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <label className={labelClass}>Mode</label>
+            <select
+              className={inputClass}
+              value={leverageMode}
+              onChange={(e) => {
+                const mode = e.target.value as 'fixed' | 'max';
+                setLeverageMode(mode);
+                if (mode === 'max') set('leverage', 'max' as unknown as StrategyConfig['leverage']);
+                else set('leverage', 10);
+              }}
+            >
+              <option value="fixed">Fixed</option>
+              <option value="max">Max available</option>
+            </select>
+          </div>
+          {leverageMode === 'fixed' ? (
+            <div>
+              <label className={labelClass}>Leverage</label>
+              <input type="number" className={inputClass} min={1} max={125} value={typeof config.leverage === 'number' ? config.leverage : 10} onChange={(e) => numField('leverage', e.target.value)} />
+            </div>
+          ) : (
+            <div>
+              <label className={labelClass}>Limit (cap max)</label>
+              <input type="number" className={inputClass} min={1} max={125} placeholder="e.g. 50" value={config.leverage_limit ?? ''} onChange={(e) => nullableNumField('leverage_limit', e.target.value)} title="Use min(exchange_max, this value)" />
+            </div>
+          )}
+          {leverageMode === 'max' && (
+            <div>
+              <label className={labelClass}>Min allowed</label>
+              <input type="number" className={inputClass} min={1} max={125} placeholder="disable if below" value={config.min_allowed_leverage ?? ''} onChange={(e) => nullableNumField('min_allowed_leverage', e.target.value)} title="Disable strategy if exchange max drops below this" />
+            </div>
+          )}
+        </div>
+      </fieldset>
 
       {/* ── Entry ── */}
       <fieldset className="border border-gray-700 rounded p-3">
