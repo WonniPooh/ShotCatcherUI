@@ -180,9 +180,22 @@ async def _handle_load_config(ws: WebSocket, worker_client: Any, filename: str) 
                 "msg": "Config file has no strategies",
             }))
             return
+
+        # Transform UI format → worker format:
+        # UI stores { symbol: "XYZUSDT", ... }
+        # Worker expects { symbols: ["XYZUSDT"], active: true, ... }
+        worker_strategies = []
+        for s in strategies:
+            w = dict(s)
+            if "symbol" in w and "symbols" not in w:
+                w["symbols"] = [w.pop("symbol")]
+            if "active" not in w:
+                w["active"] = True
+            worker_strategies.append(w)
+
         fwd = {
             "type": "start_strat",
-            "strategies": {"strategies": strategies},
+            "strategies": {"strategies": worker_strategies},
         }
         worker_client.track_outgoing(fwd)
         await worker_client.send(fwd)
