@@ -27,6 +27,7 @@ export default function DashboardPage() {
   const removeStrategy = useDashboardStore((s) => s.removeStrategy);
 
   const [selectedStrategy, setSelectedStrategy] = useState<Strategy | null>(null);
+  const [cloneConfig, setCloneConfig] = useState<StrategyConfig | null>(null);
   const [configDialog, setConfigDialog] = useState<'save' | 'load' | null>(null);
 
   const engineReady = engineState !== 'idle';
@@ -50,6 +51,14 @@ export default function DashboardPage() {
       setSelectedStrategy(null);
     },
     [send, addStrategy, modifyStrategy, selectedStrategy],
+  );
+
+  const handleCloneStrategy = useCallback(
+    (strategy: Strategy) => {
+      setSelectedStrategy(null);
+      setCloneConfig({ ...strategy.config, symbol: '' });
+    },
+    [],
   );
 
   const handleStartStrategy = useCallback(
@@ -207,7 +216,8 @@ export default function DashboardPage() {
                   onStop={handleStopStrategy}
                   onKill={handleKillStrategy}
                   onRemove={handleRemoveStrategy}
-                  onSelect={setSelectedStrategy}
+                  onSelect={(s) => { setCloneConfig(null); setSelectedStrategy(s); }}
+                  onClone={handleCloneStrategy}
                   engineReady={engineReady}
                 />
               ))}
@@ -218,11 +228,11 @@ export default function DashboardPage() {
         {/* Form sidebar — 40% */}
         <div className="w-[40%] border-l border-gray-800 overflow-y-auto p-4">
           <StrategyForm
-            key={selectedStrategy?.symbol ?? '__new'}
-            initialConfig={selectedStrategy?.config}
+            key={selectedStrategy?.symbol ?? (cloneConfig ? `__clone_${cloneConfig.symbol}` : '__new')}
+            initialConfig={selectedStrategy?.config ?? cloneConfig ?? undefined}
             isModify={selectedStrategy != null}
             onSubmit={handleFormSubmit}
-            onClear={() => setSelectedStrategy(null)}
+            onClear={() => { setSelectedStrategy(null); setCloneConfig(null); }}
           />
         </div>
       </div>
