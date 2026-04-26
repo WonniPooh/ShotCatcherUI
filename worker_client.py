@@ -233,8 +233,9 @@ class WorkerClient:
                                 self._strategies[sym]["status"] = "error"
                                 self._strategies[sym]["error"] = msg.get("msg")
                         elif msg_type == "list_strats":
-                            # Merge worker's ground truth with local cache.
-                            # Worker strategies override cache; cached-only (off/stopped) are kept.
+                            # Replace cache with worker ground truth.
+                            # Worker is authoritative: any symbol it doesn't report is removed
+                            # from cache so stale state from a previous session is cleared.
                             worker_syms: set[str] = set()
                             for s in msg.get("strategies", []):
                                 sym = s.get("symbol", "")
@@ -247,8 +248,9 @@ class WorkerClient:
                                     "status": "on" if active else "off",
                                     "error": None,
                                 }
-                            # Keep cached strategies that worker doesn't know about
-                            # (added via form but not yet started)
+                            # Remove strategies the worker no longer knows about.
+                            for stale in set(self._strategies) - worker_syms:
+                                del self._strategies[stale]
                             if self._engine_state == "idle" and (worker_syms or self._strategies):
                                 self._engine_state = "ready"
                             logger.info("Synced %d from worker, %d total cached",
