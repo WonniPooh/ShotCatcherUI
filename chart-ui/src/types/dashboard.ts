@@ -65,6 +65,7 @@ export interface StrategyReadyEvent {
 export interface StrategyStoppedEvent {
   type: 'strategy_stopped';
   symbol: string;
+  reason?: string;
 }
 
 export interface EmergencyStopCompleteEvent {

@@ -132,7 +132,9 @@ export const useDashboardStore = create<DashboardState>((set) => ({
       case 'strategy_stopped':
         set((s) => ({
           strategies: s.strategies.map((st) =>
-            st.symbol === msg.symbol ? { ...st, status: 'stopped' as const } : st,
+            st.symbol === msg.symbol
+              ? { ...st, status: 'stopped' as const, error: msg.reason ?? undefined }
+              : st,
           ),
         }));
         break;

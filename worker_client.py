@@ -205,6 +205,7 @@ class WorkerClient:
                             sym = msg.get("symbol", "")
                             if sym in self._strategies:
                                 self._strategies[sym]["status"] = "stopped"
+                                self._strategies[sym]["error"] = msg.get("reason")
                         elif msg_type == "strategy_paused":
                             sym = msg.get("symbol", "")
                             if sym in self._strategies:

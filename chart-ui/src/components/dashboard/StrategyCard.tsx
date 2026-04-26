@@ -24,7 +24,7 @@ export default function StrategyCard({
 }: StrategyCardProps) {
   const { symbol, status, config, resolved_leverage, error } = strategy;
   const isOn = status === 'on';
-  const isOff = status === 'off' || status === 'stopped';
+  const isOff = status === 'off' || status === 'stopped' || status === 'error';
   const isPaused = status === 'paused';
   const canModify = isOff || status === 'error';
 
