@@ -11,16 +11,24 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 RUN_FRONTEND=true
+RUN_COLLECTOR=false
+NO_TRADES=false
 USE_TMUX=false
 SESSION="shotcatcher-ui"
 
 for arg in "$@"; do
   case "$arg" in
-    --backend-only) RUN_FRONTEND=false ;;
-    --tmux)         USE_TMUX=true ;;
+    --backend-only)    RUN_FRONTEND=false ;;
+    --with-collector)  RUN_COLLECTOR=true ;;
+    --no-trades)       NO_TRADES=true ;;
+    --tmux)            USE_TMUX=true ;;
     *) echo "Unknown argument: $arg"; exit 1 ;;
   esac
 done
+
+if $NO_TRADES; then
+    export CHART_UI_TRADES_ENABLED=false
+fi
 
 # --- Python path for shared DB managers ---
 DM="$SCRIPT_DIR/../BinanceDataManagers"

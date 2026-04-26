@@ -411,6 +411,7 @@ async def ws_data_stream(ws: WebSocket) -> None:
     collector_client = getattr(ws.app.state, "collector_client", None)
     db_root: str = getattr(ws.app.state, "db_root",
                            str(_DM_PATH.parent / "db_files"))
+    trades_enabled: bool = getattr(ws.app.state.settings, "trades_enabled", True)
     logger.info("data-stream client connected  db_root=%s  collector=%s",
                 db_root, "connected" if collector_client and collector_client.connected else "disconnected")
 
@@ -466,6 +467,13 @@ async def ws_data_stream(ws: WebSocket) -> None:
                 if state.task and not state.task.done():
                     logger.info("[%s] cancelling previous in-flight load", symbol)
                 state.cancel()
+
+                if not trades_enabled:
+                    await ws.send_text(json.dumps({
+                        "type": "done", "symbol": symbol,
+                        "total_sent": 0, "chunk_count": 0,
+                    }))
+                    continue
 
                 db = _get_db(db_root, symbol)  # may be None — coroutine handles polling
 
